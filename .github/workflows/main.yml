@@ -1,0 +1,22 @@
+name: Deploy backend
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Docker build and deploy backend
+        run: docker compose build backend && docker compose up -d --no-deps backend
+
+      - name: Docker cleanup
+        run: docker system prune -f
