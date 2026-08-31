@@ -11,6 +11,9 @@ env:
 jobs:
   deploy:
     runs-on: self-hosted
+    env:
+      LINKEDIN_LI_AT: ${{ secrets.LINKEDIN_LI_AT }}
+      LINKEDIN_JSESSIONID: ${{ secrets.LINKEDIN_JSESSIONID }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6

@@ -5,4 +5,7 @@ services:
       - "8500:8500"
     env_file:
       - backend/.env
+    environment:
+      - LINKEDIN_LI_AT
+      - LINKEDIN_JSESSIONID
     restart: always
