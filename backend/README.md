@@ -53,10 +53,10 @@ Interactive docs: `http://127.0.0.1:8500/docs`
 From the project root:
 
 ```bash
-docker compose up --build
+docker compose --env-file backend/.env up --build
 ```
 
-The container reads credentials from `backend/.env` and exposes port `8500`.
+Credentials are read from `backend/.env` (or from the environment in CI) and the service exposes port `8500`.
 
 ## API
 
