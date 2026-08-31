@@ -58,6 +58,168 @@ docker compose up --build
 
 The container reads credentials from `backend/.env` and exposes port `8500`.
 
+## API
+
+### `GET /profile`
+
+Fetch structured profile data for a LinkedIn public profile URL.
+
+**Query parameters**
+
+| Parameter | Type   | Required | Description                                      |
+| --------- | ------ | -------- | ------------------------------------------------ |
+| `url`     | string | yes      | Full LinkedIn profile URL (`https://www.linkedin.com/in/<vanity>`) |
+
+**Example request**
+
+```bash
+curl "http://127.0.0.1:8500/profile?url=https://www.linkedin.com/in/johndoe"
+```
+
+**Success response** (`200 OK`)
+
+Returns a JSON object with the following fields:
+
+| Field                    | Type     | Description                                      |
+| ------------------------ | -------- | ------------------------------------------------ |
+| `profile_url`            | string   | Canonical profile URL                            |
+| `member_identity`        | string   | LinkedIn internal member identifier              |
+| `name`                   | string   | Full name                                        |
+| `headline`               | string   | Professional headline                            |
+| `location`               | string   | Location string                                  |
+| `about`                  | string   | About / summary section                          |
+| `profile_picture_url`    | string   | Profile photo URL                                |
+| `work_experience`        | array    | Work history (see below)                         |
+| `volunteer_experience`   | array    | Volunteer roles (see below)                      |
+| `education`              | array    | Education entries (see below)                    |
+| `projects`               | array    | Projects (see below)                             |
+| `skills`                 | array    | Skills with optional category and associations   |
+| `honors_awards`          | array    | Honors and awards                                |
+| `test_scores`            | array    | Test scores                                      |
+| `languages`              | array    | Languages and proficiency levels                 |
+| `licenses_certifications`| array    | Licenses and certifications                      |
+| `contact_info`           | object   | Contact details (often sparse; see below)        |
+
+**Nested objects**
+
+`work_experience` items:
+
+| Field             | Type   |
+| ----------------- | ------ |
+| `title`           | string |
+| `company`         | string |
+| `employment_type` | string |
+| `location`        | string |
+| `start_date`      | string |
+| `end_date`        | string |
+| `description`     | string |
+
+`volunteer_experience` items:
+
+| Field          | Type   |
+| -------------- | ------ |
+| `role`         | string |
+| `organization` | string |
+| `cause`        | string |
+| `start_date`   | string |
+| `end_date`     | string |
+| `description`  | string |
+
+`education` items:
+
+| Field        | Type   |
+| ------------ | ------ |
+| `school`     | string |
+| `degree`     | string |
+| `start_date` | string |
+| `end_date`   | string |
+
+`skills` items:
+
+| Field                    | Type   |
+| ------------------------ | ------ |
+| `name`                   | string |
+| `category`               | string |
+| `associated_experiences` | array of `{ title, company }` |
+
+`projects` items:
+
+| Field             | Type   |
+| ----------------- | ------ |
+| `title`           | string |
+| `description`     | string |
+| `url`             | string |
+| `start_date`      | string |
+| `end_date`        | string |
+| `associated_with` | string |
+
+`honors_awards` items:
+
+| Field         | Type   |
+| ------------- | ------ |
+| `title`       | string |
+| `issuer`      | string |
+| `issue_date`  | string |
+| `description` | string |
+
+`test_scores` items:
+
+| Field           | Type   |
+| --------------- | ------ |
+| `name`          | string |
+| `score_summary` | string |
+| `score`         | string |
+| `max_score`     | string |
+| `date`          | string |
+| `description`   | string |
+
+`languages` items:
+
+| Field         | Type   |
+| ------------- | ------ |
+| `name`        | string |
+| `proficiency` | string |
+
+`licenses_certifications` items:
+
+| Field              | Type   |
+| ------------------ | ------ |
+| `name`             | string |
+| `issuer`           | string |
+| `issue_date`       | string |
+| `expiration_date`  | string |
+| `credential_id`    | string |
+| `credential_url`   | string |
+| `issuer_url`       | string |
+| `issuer_logo_url`  | string |
+| `skills_preview`   | string |
+
+`contact_info`:
+
+| Field           | Type           |
+| --------------- | -------------- |
+| `profile_url`   | string         |
+| `email`         | string         |
+| `phone_numbers` | array (string) |
+| `websites`      | array (string) |
+| `address`       | string         |
+| `birthday`      | string         |
+| `connected_on`  | string         |
+
+Most string fields may be `null` when LinkedIn does not expose them to your session. Array fields default to `[]` when empty.
+
+**Error responses**
+
+| Status | When                                                                 |
+| ------ | -------------------------------------------------------------------- |
+| `400`  | Invalid or malformed LinkedIn profile URL                            |
+| `401`  | LinkedIn session expired — refresh `li_at` and `JSESSIONID` in `.env` |
+| `404`  | Profile not found                                                    |
+| `502`  | LinkedIn returned an unexpected or unparseable response              |
+| `503`  | LinkedIn rate limit hit — retry later                                |
+
+Error bodies follow FastAPI's default shape: `{ "detail": "<message>" }`.
+
 ### Deployment
 
 Pushes to `main` trigger a self-hosted GitHub Actions workflow that rebuilds and
