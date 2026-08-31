@@ -3,4 +3,6 @@ services:
     build: ./backend
     ports:
       - "8500:8500"
+    env_file:
+      - backend/.env
     restart: always

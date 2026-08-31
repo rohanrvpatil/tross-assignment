@@ -1,19 +1,20 @@
-from typing import Annotated
+from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, Query
+from dotenv import load_dotenv
+from fastapi import FastAPI
 
-app = FastAPI()
+from backend.routers.profile import router as profile_router
+
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
+app = FastAPI(title="LinkedIn Profile API")
+app.include_router(profile_router)
 
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Annotated[str | None, Query()] = None):
-    return {"item_id": item_id, "q": q}
+    return {"message": "Server is online"}
 
 
 def main() -> None:

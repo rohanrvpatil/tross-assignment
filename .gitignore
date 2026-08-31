@@ -1,2 +1,6 @@
 .cursor
 .vscode
+.env
+.venv/
+__pycache__/
+*.py[cod]
